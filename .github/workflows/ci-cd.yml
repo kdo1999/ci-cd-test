@@ -23,7 +23,9 @@ jobs:
         cache: gradle
 
     - name: Build with Gradle
-      run: ./gradlew bootJar
+      run: |
+        cd backend
+        ./gradlew bootJar
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
