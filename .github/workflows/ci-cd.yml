@@ -51,7 +51,8 @@ jobs:
     - name: Build and push Docker image
       uses: docker/build-push-action@v4
       with:
-        context: ./backend
+        context: ./backend  # context 디렉토리 설정
+        dockerfile: ./backend/Dockerfile  # Dockerfile 경로 설정
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
