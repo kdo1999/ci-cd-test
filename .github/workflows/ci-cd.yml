@@ -62,10 +62,10 @@ jobs:
       if: success()
       uses: appleboy/jenkins-action@master
       with:
-        url: http://152.67.218.230:8081/
+        url: ${{ secrets.JENKINS_URL }}
         user: ${{ secrets.JENKINS_USER }}
         token: ${{ secrets.JENKINS_DEPLOY_TOKEN }}
-        job: ci-cd-jenkins
+        job: ${{ secrets.JENKINS_JOB }}
     
 #    - name: Trigger Jenkins Deployment
 #      if: success()
