@@ -58,3 +58,10 @@ jobs:
         cache-from: type=gha
         cache-to: type=gha,mode=max
         platforms: linux/amd64,linux/arm64
+        
+    - name: Trigger Jenkins Deployment
+      if: success()
+      run: |
+        curl -X POST \
+        -u ${{ secrets.JENKINS_USER }}:${{ secrets.JENKINS_TOKEN }} \
+        "${{ secrets.JENKINS_URL }}/job/deploy-alllink-backend/buildWithParameters?token=${{ secrets.JENKINS_DEPLOY_TOKEN }}&IMAGE_TAG=${{ steps.meta.outputs.tags }}"
