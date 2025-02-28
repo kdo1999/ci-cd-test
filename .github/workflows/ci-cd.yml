@@ -10,7 +10,7 @@ on:
       - 'backend/Dockerfile'
     branches:
       - main
-    
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -20,7 +20,7 @@ jobs:
 
     steps:
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Set up JDK 21
       uses: actions/setup-java@v3
@@ -44,6 +44,26 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.REPOSITORY_TOKEN }}
 
+    - name: Create Tag
+      id: create_tag
+      uses: mathieudutour/github-tag-action@v6.2
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ steps.create_tag.outputs.new_tag }}
+        release_name: Release ${{ steps.create_tag.outputs.new_tag }}
+        body: |
+          Changes in this release:
+          ${{ steps.create_tag.outputs.changelog }}
+        draft: false
+        prerelease: false
+
     - name: Extract metadata for Docker
       id: meta
       uses: docker/metadata-action@v4
@@ -54,18 +74,20 @@ jobs:
           type=ref,event=pr
           type=sha,format=long
           latest
+          ${{ steps.create_tag.outputs.new_tag }}
 
     - name: Build and push Docker image
       uses: docker/build-push-action@v4
       with:
-        context: ./backend  # context 디렉토리 설정
+        context: ./backend
         push: true
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
         cache-from: type=gha
         cache-to: type=gha,mode=max
         platforms: linux/amd64,linux/arm64
-    - name: jenkins deploy
+
+    - name: Jenkins deploy
       if: success()
       uses: appleboy/jenkins-action@master
       with:
@@ -73,10 +95,3 @@ jobs:
         user: ${{ secrets.JENKINS_USER }}
         token: ${{ secrets.JENKINS_DEPLOY_TOKEN }}
         job: ${{ secrets.JENKINS_JOB }}
-    
-#    - name: Trigger Jenkins Deployment
-#      if: success()
-#      run: |
-#        curl -X POST \
-#        -u ${{ secrets.JENKINS_USER }}:${{ secrets.JENKINS_TOKEN }} \
-#        "${{ secrets.JENKINS_URL }}/job/deploy-ci-cd-test/buildWithParameters?token=${{ secrets.JENKINS_DEPLOY_TOKEN }}&IMAGE_TAG=${{ steps.meta.outputs.tags }}"
