@@ -60,9 +60,6 @@ jobs:
       with:
         images: ghcr.io/${{ github.repository }}/ci-cd-backend
         tags: |
-          type=ref,event=branch
-          type=ref,event=pr
-          type=sha,format=long
           latest
           ${{ needs.makeTagAndRelease.outputs.tag_name }}
     - name: Build and push Docker image
