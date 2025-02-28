@@ -32,6 +32,7 @@ jobs:
         cd backend
         ./gradlew bootJar
     - name: Create Tag
+      id: create_tag
       uses: mathieudutour/github-tag-action@v6.2
       with:
         github_token: ${{ secrets.REPOSITORY_TOKEN }}
