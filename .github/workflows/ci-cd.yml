@@ -2,7 +2,14 @@ name: Build and Push Docker Image
 
 on:
   push:
-    branches: [ main, develop ]
+    paths:
+      - '.github/workflows/**'
+      - 'src/**'
+      - 'build.gradle'
+      - 'build.gradle.kts'
+      - 'Dockerfile'
+    branches:
+      - main
     
 jobs:
   build:
